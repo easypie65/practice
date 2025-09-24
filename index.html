@@ -397,6 +397,12 @@
                         <div class="formula">tan θ = 대변/인변</div>
                     </div>
                 </div>
+
+                <!-- 진행상황 관리 버튼 -->
+                <div style="background: #f8f9ff; padding: 15px; border-radius: 15px; margin-bottom: 20px; text-align: center;">
+                    <div style="font-size: 0.9em; color: #666; margin-bottom: 10px;">진행상황 관리</div>
+                    <button class="btn btn-secondary" onclick="resetProgress()" style="padding: 8px 16px; font-size: 0.9em;">처음부터 다시 시작</button>
+                </div>
                 
                 <ul class="topic-list">
                     <li class="topic-item" data-topic="basic">
@@ -452,6 +458,7 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
         // 전역 변수
         let currentTopic = '';
@@ -463,7 +470,277 @@
             currentStreak: 0
         };
 
-        // 삼각형 이미지 생성 함수
+        // 문제 변형 함수들
+        function getRandomNumbers() {
+            const sets = [
+                {hypotenuse: "10", opposite: "6", adjacent: "8"},
+                {hypotenuse: "13", opposite: "5", adjacent: "12"},
+                {hypotenuse: "15", opposite: "9", adjacent: "12"},
+                {hypotenuse: "17", opposite: "8", adjacent: "15"},
+                {hypotenuse: "25", opposite: "15", adjacent: "20"},
+                {hypotenuse: "26", opposite: "10", adjacent: "24"}
+            ];
+            return sets[Math.floor(Math.random() * sets.length)];
+        }
+
+        function getRandomFraction() {
+            const fractions = [
+                {sin: "3/5", cos: "4/5", h: "5", o: "3", a: "4"},
+                {sin: "5/13", cos: "12/13", h: "13", o: "5", a: "12"},
+                {sin: "8/17", cos: "15/17", h: "17", o: "8", a: "15"},
+                {sin: "7/25", cos: "24/25", h: "25", o: "7", a: "24"},
+                {sin: "9/15", cos: "12/15", h: "15", o: "9", a: "12"}
+            ];
+            return fractions[Math.floor(Math.random() * fractions.length)];
+        }
+
+        function getRandomBuilding() {
+            const buildings = [
+                {height: "20", distance: "50", answer: "2/5"},
+                {height: "15", distance: "36", answer: "5/12"},
+                {height: "24", distance: "32", answer: "3/4"},
+                {height: "18", distance: "24", answer: "3/4"},
+                {height: "30", distance: "40", answer: "3/4"}
+            ];
+            return buildings[Math.floor(Math.random() * buildings.length)];
+        }
+
+        // 캡처 및 업로드 함수
+        function captureAndUpload() {
+            // 화면 캡처 (html2canvas 라이브러리 필요)
+            if (typeof html2canvas !== 'undefined') {
+                html2canvas(document.body).then(canvas => {
+                    // 캔버스를 이미지로 변환
+                    const imageData = canvas.toDataURL('image/png');
+                    
+                    // 다운로드 링크 생성
+                    const link = document.createElement('a');
+                    link.download = `삼각비마스터_100%달성_${new Date().toLocaleDateString()}.png`;
+                    link.href = imageData;
+                    link.click();
+                    
+                    // 업로드 안내
+                    showUploadGuide();
+                });
+            } else {
+                // html2canvas가 없으면 스크린샷 안내
+                showScreenshotGuide();
+            }
+        }
+
+        function showUploadGuide() {
+            const uploadModal = document.createElement('div');
+            uploadModal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+            `;
+            
+            uploadModal.innerHTML = `
+                <div style="background: white; padding: 30px; border-radius: 20px; max-width: 500px; text-align: center;">
+                    <h2 style="color: #27ae60; margin-bottom: 20px;">🎉 100% 달성 축하합니다!</h2>
+                    <p style="margin-bottom: 20px; line-height: 1.6;">
+                        화면이 캡처되어 다운로드되었습니다!<br>
+                        <strong>3학년 6반</strong> 학생들은 아래 링크에서 인증샷을 올려주세요!
+                    </p>
+                    <div style="background: #f8f9ff; padding: 15px; border-radius: 10px; margin: 20px 0;">
+                        <strong>업로드 링크:</strong><br>
+                        <a href="https://b.tkbell.co.kr/tkboard/woi/1243615/6meBlp16an.do?pageSeq=1909638" 
+                           target="_blank" 
+                           style="color: #4facfe; word-break: break-all;">
+                            https://b.tkbell.co.kr/tkboard/woi/1243615/6meBlp16an.do?pageSeq=1909638
+                        </a>
+                    </div>
+                    <div style="display: flex; gap: 15px; justify-content: center;">
+                        <button onclick="window.open('https://b.tkbell.co.kr/tkboard/woi/1243615/6meBlp16an.do?pageSeq=1909638', '_blank')" 
+                                style="background: #27ae60; color: white; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-weight: bold;">
+                            업로드하러 가기
+                        </button>
+                        <button onclick="this.closest('div').parentElement.remove()" 
+                                style="background: #95a5a6; color: white; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer;">
+                            닫기
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(uploadModal);
+        }
+
+        function showScreenshotGuide() {
+            const screenshotModal = document.createElement('div');
+            screenshotModal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+            `;
+            
+            screenshotModal.innerHTML = `
+                <div style="background: white; padding: 30px; border-radius: 20px; max-width: 500px; text-align: center;">
+                    <h2 style="color: #27ae60; margin-bottom: 20px;">🎉 100% 달성 축하합니다!</h2>
+                    <p style="margin-bottom: 20px; line-height: 1.6;">
+                        이 화면을 스크린샷으로 캡처해주세요!<br>
+                        <small style="color: #666;">(Windows: Win+Shift+S, Mac: Cmd+Shift+4)</small>
+                    </p>
+                    <p style="margin-bottom: 20px;">
+                        <strong>3학년 6반</strong> 학생들은 아래 링크에서 인증샷을 올려주세요!
+                    </p>
+                    <div style="background: #f8f9ff; padding: 15px; border-radius: 10px; margin: 20px 0;">
+                        <strong>업로드 링크:</strong><br>
+                        <a href="https://b.tkbell.co.kr/tkboard/woi/1243615/6meBlp16an.do?pageSeq=1909638" 
+                           target="_blank" 
+                           style="color: #4facfe; word-break: break-all;">
+                            https://b.tkbell.co.kr/tkboard/woi/1243615/6meBlp16an.do?pageSeq=1909638
+                        </a>
+                    </div>
+                    <div style="display: flex; gap: 15px; justify-content: center;">
+                        <button onclick="window.open('https://b.tkbell.co.kr/tkboard/woi/1243615/6meBlp16an.do?pageSeq=1909638', '_blank')" 
+                                style="background: #27ae60; color: white; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-weight: bold;">
+                            업로드하러 가기
+                        </button>
+                        <button onclick="this.closest('div').parentElement.remove()" 
+                                style="background: #95a5a6; color: white; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer;">
+                            닫기
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(screenshotModal);
+        }
+        function saveProgress() {
+            const progressData = {
+                stats: stats,
+                currentTopic: currentTopic,
+                currentProblemIndex: currentProblemIndex,
+                completedTopics: []
+            };
+            
+            // 완료된 주제들 저장
+            document.querySelectorAll('.topic-item.completed').forEach(item => {
+                progressData.completedTopics.push(item.getAttribute('data-topic'));
+            });
+            
+            localStorage.setItem('trigonometry_progress', JSON.stringify(progressData));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('trigonometry_progress');
+            if (saved) {
+                const progressData = JSON.parse(saved);
+                
+                // 통계 복원
+                stats = progressData.stats || {
+                    totalSolved: 0,
+                    correctAnswers: 0,
+                    currentStreak: 0
+                };
+                
+                // 현재 진행 상황 복원
+                currentTopic = progressData.currentTopic || '';
+                currentProblemIndex = progressData.currentProblemIndex || 0;
+                
+                // 완료된 주제들 표시 복원
+                if (progressData.completedTopics) {
+                    progressData.completedTopics.forEach(topic => {
+                        const topicItem = document.querySelector(`[data-topic="${topic}"]`);
+                        if (topicItem) {
+                            topicItem.classList.add('completed');
+                        }
+                    });
+                }
+                
+                return true;
+            }
+            return false;
+        }
+
+        function resetProgress() {
+            localStorage.removeItem('trigonometry_progress');
+            
+            // 통계 초기화
+            stats = {
+                totalSolved: 0,
+                correctAnswers: 0,
+                currentStreak: 0
+            };
+            
+            // 현재 상태 초기화
+            currentTopic = '';
+            currentProblemIndex = 0;
+            
+            // 완료 표시 제거
+            document.querySelectorAll('.topic-item').forEach(item => {
+                item.classList.remove('completed');
+                item.classList.remove('active');
+            });
+            
+            // 환영 화면으로 복귀
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            const problemCard = document.getElementById('problemCard');
+            
+            if (welcomeScreen) welcomeScreen.style.display = 'block';
+            if (problemCard) problemCard.style.display = 'none';
+            
+            updateStats();
+        }
+        function generateProblem(baseProblem, variation = 0) {
+            const newProblem = JSON.parse(JSON.stringify(baseProblem)); // 깊은 복사
+            
+            if (baseProblem.title.includes("기본 개념")) {
+                const numbers = getRandomNumbers();
+                newProblem.image = createTriangleImage(numbers.hypotenuse, numbers.opposite, numbers.adjacent, "θ");
+                
+                if (baseProblem.title.includes("1")) { // sin 문제
+                    const sinValue = (parseFloat(numbers.opposite) / parseFloat(numbers.hypotenuse)).toFixed(2);
+                    newProblem.text = `직각삼각형 ABC에서 ∠A = θ일 때, sin θ의 값은?`;
+                    newProblem.options = [sinValue, "0.8", "0.75", "1.2"];
+                    newProblem.correct = 0;
+                    newProblem.explanation = `각 A에서 보면 대변은 BC = ${numbers.opposite}, 빗변은 AC = ${numbers.hypotenuse}이므로\nsin θ = sin A = 대변/빗변 = ${numbers.opposite}/${numbers.hypotenuse} = ${sinValue}입니다.`;
+                } else if (baseProblem.title.includes("2")) { // cos 문제
+                    const cosValue = (parseFloat(numbers.adjacent) / parseFloat(numbers.hypotenuse)).toFixed(2);
+                    newProblem.text = `직각삼각형 ABC에서 ∠A = θ일 때, cos θ의 값은?`;
+                    newProblem.options = ["0.6", cosValue, "1.25", "0.75"];
+                    newProblem.correct = 1;
+                    newProblem.explanation = `각 A에서 보면 인변은 AB = ${numbers.adjacent}, 빗변은 AC = ${numbers.hypotenuse}이므로\ncos θ = cos A = 인변/빗변 = ${numbers.adjacent}/${numbers.hypotenuse} = ${cosValue}입니다.`;
+                } else if (baseProblem.title.includes("3")) { // tan 문제
+                    const tanValue = (parseFloat(numbers.opposite) / parseFloat(numbers.adjacent)).toFixed(2);
+                    newProblem.text = `직각삼각형 ABC에서 ∠A = θ일 때, tan θ의 값은?`;
+                    newProblem.options = [tanValue, "1.33", "0.6", "0.8"];
+                    newProblem.correct = 0;
+                    newProblem.explanation = `각 A에서 보면 대변은 BC = ${numbers.opposite}, 인변은 AB = ${numbers.adjacent}이므로\ntan θ = tan A = 대변/인변 = ${numbers.opposite}/${numbers.adjacent} = ${tanValue}입니다.`;
+                }
+            } else if (baseProblem.title.includes("계산 문제 1")) {
+                const frac = getRandomFraction();
+                newProblem.text = `직각삼각형 ABC에서 ∠B = 90°이고, ∠A = θ, sin θ = ${frac.sin}일 때, cos θ의 값은?`;
+                newProblem.options = [frac.cos, "3/4", "5/4", "5/3"];
+                newProblem.correct = 0;
+                newProblem.explanation = `sin θ = ${frac.sin}이므로 대변:빗변 = ${frac.o}:${frac.h}입니다.\n피타고라스 정리로 인변을 구하면: 인변 = √(${frac.h}² - ${frac.o}²) = ${frac.a}\n따라서 cos θ = 인변/빗변 = ${frac.a}/${frac.h} = ${frac.cos}입니다.`;
+            } else if (baseProblem.title.includes("활용 문제 1")) {
+                const building = getRandomBuilding();
+                newProblem.text = `높이 ${building.height}m인 건물을 ${building.distance}m 거리에서 올려다본 각을 θ라 할 때, tan θ는?`;
+                newProblem.options = [building.answer, "5/2", "3/4", "4/3"];
+                newProblem.correct = 0;
+                newProblem.explanation = `tan θ = 대변/인변 = 건물높이/거리 = ${building.height}/${building.distance} = ${building.answer}입니다.`;
+                newProblem.image = `<div style="text-align: center;"><svg width="250" height="140" viewBox="0 0 250 140"><rect x="180" y="40" width="15" height="80" fill="#4facfe"/><line x1="20" y1="120" x2="220" y2="120" stroke="#333" stroke-width="2"/><line x1="50" y1="120" x2="185" y2="40" stroke="#e74c3c" stroke-width="2" stroke-dasharray="3,3"/><text x="115" y="135" text-anchor="middle" font-size="12" fill="#333">${building.distance}m</text><text x="205" y="85" font-size="12" fill="#333">${building.height}m</text><text x="60" y="110" font-size="12" fill="#e74c3c" font-weight="bold">θ</text></svg></div>`;
+            }
+            
+            return newProblem;
+        }
         function createTriangleImage(hypotenuse, opposite, adjacent, angle) {
             return `
                 <svg width="250" height="180" viewBox="0 0 250 180">
@@ -803,7 +1080,7 @@
             }
         }
 
-        // 통계 업데이트
+        // 통계 업데이트 (진행상황 저장 추가)
         function updateStats() {
             const totalSolvedElement = document.getElementById('totalSolved');
             const correctRateElement = document.getElementById('correctRate');
@@ -828,6 +1105,9 @@
                 const progress = (stats.totalSolved / totalProblems) * 100;
                 progressFillElement.style.width = progress + '%';
             }
+            
+            // 진행 상황 자동 저장
+            saveProgress();
         }
 
         // 주제 완료 표시
@@ -864,6 +1144,38 @@
                 let nextTopicButtons = '';
                 let congratsMessage = '';
                 
+                // 모든 주제 완료 확인
+                const allTopicsCompleted = checkAllTopicsCompleted();
+                
+                if (currentTopic === 'mixed' && allTopicsCompleted && correctRate >= 66) {
+                    // 모든 주제 완료 + 종합문제까지 완료 = 100% 달성!
+                    document.getElementById('problemCard').innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <h1 style="color: #27ae60; margin-bottom: 20px; font-size: 3em;">🏆</h1>
+                            <h2 style="color: #27ae60; margin-bottom: 20px;">삼각비 마스터 달성!</h2>
+                            <p style="font-size: 1.3em; margin-bottom: 20px; color: #27ae60; font-weight: bold;">
+                                🎉 100% 완전 정복! 🎉
+                            </p>
+                            <p style="font-size: 1.1em; margin-bottom: 30px; line-height: 1.6;">
+                                모든 주제를 완료하고 종합문제까지 성공했습니다!<br>
+                                당신은 진정한 <strong>삼각비 마스터</strong>입니다! 👑
+                            </p>
+                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 15px; margin: 20px 0;">
+                                <h3 style="margin-bottom: 15px;">🏫 3학년 6반 학생들</h3>
+                                <p style="margin-bottom: 15px;">100% 달성 인증샷을 업로드해주세요!</p>
+                            </div>
+                            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                                <button class="btn btn-primary" onclick="captureAndUpload()" style="background: linear-gradient(135deg, #27ae60, #2ecc71); font-size: 1.1em; padding: 15px 25px;">
+                                    📸 인증샷 캡처 & 업로드
+                                </button>
+                                <button class="btn btn-secondary" onclick="resetProgress()">새로운 도전 시작</button>
+                                <button class="btn btn-secondary" onclick="goToWelcome()">주제 선택하기</button>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
                 switch(currentTopic) {
                     case 'basic':
                         congratsMessage = '기본 개념을 완료했습니다! 이제 다음 단계로 넘어갈 준비가 되었어요!';
@@ -893,7 +1205,7 @@
                         `;
                         break;
                     case 'mixed':
-                        congratsMessage = '모든 과정을 완료했습니다! 삼각비 마스터가 되셨네요!';
+                        congratsMessage = '종합 문제를 완료했습니다! 다른 주제들도 완료해서 100%를 달성해보세요!';
                         nextTopicButtons = '';
                         break;
                 }
@@ -919,6 +1231,15 @@
             if (completedItem && correctRate >= 66) {
                 completedItem.classList.add('completed');
             }
+        }
+
+        // 모든 주제 완료 확인
+        function checkAllTopicsCompleted() {
+            const topics = ['basic', 'calculation', 'special', 'application', 'mixed'];
+            return topics.every(topic => {
+                const topicItem = document.querySelector(`[data-topic="${topic}"]`);
+                return topicItem && topicItem.classList.contains('completed');
+            });
         }
 
         // 각 주제로 이동하는 개별 함수들
@@ -950,6 +1271,15 @@
             stats.totalSolved = 0;
             stats.correctAnswers = 0;
             stats.currentStreak = 0;
+            
+            // 문제를 변형하여 새로운 버전으로 생성
+            const originalProblems = problemSets[currentTopic];
+            const newProblems = originalProblems.map((problem, index) => {
+                return generateProblem(problem, Math.floor(Math.random() * 3) + 1);
+            });
+            
+            // 변형된 문제로 교체
+            problemSets[currentTopic] = newProblems;
             
             // 현재 주제 다시 시작
             currentProblemIndex = 0;
@@ -1018,6 +1348,9 @@
 
         // 이벤트 리스너 설정
         document.addEventListener('DOMContentLoaded', function() {
+            // 저장된 진행상황 로드
+            const hasProgress = loadProgress();
+            
             // 주제 항목 클릭 이벤트
             document.querySelectorAll('.topic-item').forEach(item => {
                 item.addEventListener('click', function() {
@@ -1033,16 +1366,64 @@
             });
 
             // 힌트 버튼 클릭 이벤트
-            document.getElementById('hintBtn').addEventListener('click', showHint);
+            const hintBtn = document.getElementById('hintBtn');
+            if (hintBtn) hintBtn.addEventListener('click', showHint);
 
             // 정답 확인 버튼 클릭 이벤트
-            document.getElementById('checkBtn').addEventListener('click', checkAnswer);
+            const checkBtn = document.getElementById('checkBtn');
+            if (checkBtn) checkBtn.addEventListener('click', checkAnswer);
 
             // 다음 문제 버튼 클릭 이벤트
-            document.getElementById('nextBtn').addEventListener('click', nextProblem);
+            const nextBtn = document.getElementById('nextBtn');
+            if (nextBtn) nextBtn.addEventListener('click', nextProblem);
 
             // 초기 통계 표시
             updateStats();
+            
+            // 진행상황이 있고 현재 주제가 설정되어 있다면 복원
+            if (hasProgress && currentTopic) {
+                const activeItem = document.querySelector(`[data-topic="${currentTopic}"]`);
+                if (activeItem) {
+                    activeItem.classList.add('active');
+                }
+                
+                // 진행중인 주제가 있으면 문제 화면으로
+                if (currentTopic && currentProblemIndex >= 0) {
+                    const welcomeScreen = document.getElementById('welcomeScreen');
+                    const problemCard = document.getElementById('problemCard');
+                    
+                    if (welcomeScreen) welcomeScreen.style.display = 'none';
+                    if (problemCard) problemCard.style.display = 'block';
+                    
+                    // 기본 구조 설정
+                    problemCard.innerHTML = `
+                        <h3 class="problem-title" id="problemTitle">문제</h3>
+                        <div class="problem-image" id="problemImage"></div>
+                        <div class="problem-text" id="problemText">문제 내용이 여기에 표시됩니다.</div>
+                        <div class="options" id="optionsContainer"></div>
+                        <div class="buttons">
+                            <button class="btn btn-secondary" id="hintBtn">💡 힌트</button>
+                            <button class="btn btn-primary" id="checkBtn" disabled>정답 확인</button>
+                            <button class="btn btn-primary" id="nextBtn" style="display: none;">다음 문제</button>
+                        </div>
+                        <div class="feedback" id="feedback">
+                            <div id="feedbackText"></div>
+                            <div class="explanation" id="explanation"></div>
+                        </div>
+                    `;
+                    
+                    // 이벤트 리스너 재연결
+                    const hintBtn = document.getElementById('hintBtn');
+                    const checkBtn = document.getElementById('checkBtn');
+                    const nextBtn = document.getElementById('nextBtn');
+                    
+                    if (hintBtn) hintBtn.addEventListener('click', showHint);
+                    if (checkBtn) checkBtn.addEventListener('click', checkAnswer);
+                    if (nextBtn) nextBtn.addEventListener('click', nextProblem);
+                    
+                    showProblem();
+                }
+            }
         });
     </script>
 </body>
