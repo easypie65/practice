@@ -258,13 +258,6 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
 
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
         .feedback {
             margin-top: 20px;
             padding: 20px;
@@ -288,7 +281,6 @@
             margin-top: 15px;
             font-size: 1em;
             line-height: 1.5;
-            white-space: pre-line;
         }
 
         .reference-card {
@@ -353,23 +345,6 @@
             box-shadow: 0 15px 35px rgba(79, 172, 254, 0.4);
         }
 
-        .topic-complete {
-            text-align: center;
-            padding: 40px;
-        }
-
-        .complete-title {
-            font-size: 2.2em;
-            color: #4caf50;
-            margin-bottom: 20px;
-        }
-
-        .complete-message {
-            font-size: 1.1em;
-            color: #666;
-            margin-bottom: 30px;
-        }
-
         @media (max-width: 768px) {
             .main-content {
                 flex-direction: column;
@@ -424,23 +399,23 @@
                 </div>
                 
                 <ul class="topic-list">
-                    <li class="topic-item" data-topic="basic" onclick="selectTopic('basic')">
+                    <li class="topic-item" data-topic="basic">
                         <strong>기본 개념</strong>
                         <div style="font-size: 0.9em; color: #666; margin-top: 5px;">삼각비의 정의와 기본 개념</div>
                     </li>
-                    <li class="topic-item" data-topic="calculation" onclick="selectTopic('calculation')">
+                    <li class="topic-item" data-topic="calculation">
                         <strong>삼각비 계산</strong>
                         <div style="font-size: 0.9em; color: #666; margin-top: 5px;">주어진 조건으로 삼각비 구하기</div>
                     </li>
-                    <li class="topic-item" data-topic="special" onclick="selectTopic('special')">
+                    <li class="topic-item" data-topic="special">
                         <strong>특수각</strong>
                         <div style="font-size: 0.9em; color: #666; margin-top: 5px;">30°, 45°, 60° 삼각비</div>
                     </li>
-                    <li class="topic-item" data-topic="application" onclick="selectTopic('application')">
+                    <li class="topic-item" data-topic="application">
                         <strong>활용 문제</strong>
                         <div style="font-size: 0.9em; color: #666; margin-top: 5px;">실생활 문제 해결하기</div>
                     </li>
-                    <li class="topic-item" data-topic="mixed" onclick="selectTopic('mixed')">
+                    <li class="topic-item" data-topic="mixed">
                         <strong>종합 문제</strong>
                         <div style="font-size: 0.9em; color: #666; margin-top: 5px;">모든 내용을 종합한 문제</div>
                     </li>
@@ -455,7 +430,7 @@
                         맞춤형 문제들이 차례대로 나타납니다.<br>
                         각 문제마다 자세한 해설과 함께 실력을 키워보세요!
                     </p>
-                    <button class="start-btn" onclick="selectTopic('basic')">기본 개념부터 시작하기</button>
+                    <button class="start-btn" data-topic="basic">기본 개념부터 시작하기</button>
                 </div>
 
                 <div id="problemCard" class="problem-card">
@@ -464,20 +439,14 @@
                     <div class="problem-text" id="problemText">문제 내용이 여기에 표시됩니다.</div>
                     <div class="options" id="optionsContainer"></div>
                     <div class="buttons">
-                        <button class="btn btn-secondary" id="hintBtn" onclick="showHint()">💡 힌트</button>
-                        <button class="btn btn-primary" id="checkBtn" onclick="checkAnswer()" disabled>정답 확인</button>
-                        <button class="btn btn-primary" id="nextBtn" onclick="nextProblem()" style="display: none;">다음 문제</button>
+                        <button class="btn btn-secondary" id="hintBtn">💡 힌트</button>
+                        <button class="btn btn-primary" id="checkBtn" disabled>정답 확인</button>
+                        <button class="btn btn-primary" id="nextBtn" style="display: none;">다음 문제</button>
                     </div>
                     <div class="feedback" id="feedback">
                         <div id="feedbackText"></div>
                         <div class="explanation" id="explanation"></div>
                     </div>
-                </div>
-
-                <div id="topicComplete" class="topic-complete" style="display: none;">
-                    <h2 class="complete-title">🎉 주제 완료!</h2>
-                    <p class="complete-message">이 주제의 모든 문제를 완료했습니다.<br>다른 주제를 선택해보세요.</p>
-                    <button class="btn btn-primary" onclick="returnToWelcome()">다른 주제 선택하기</button>
                 </div>
             </div>
         </div>
@@ -493,7 +462,6 @@
             correctAnswers: 0,
             currentStreak: 0
         };
-        let topicStats = {};
 
         // 삼각형 이미지 생성 함수
         function createTriangleImage(hypotenuse, opposite, adjacent, angle) {
@@ -557,28 +525,28 @@
             calculation: [
                 {
                     title: "계산 문제 1",
-                    text: "직각삼각형에서 ∠A = θ이고, sin θ = 3/5일 때, cos θ의 값은?",
-                    image: createTriangleImage("5", "3", "4", "θ"),
+                    text: "직각삼각형 ABC에서 ∠B = 90°이고, ∠A = θ, sin θ = 3/5일 때, cos θ의 값은?",
+                    image: "",
                     options: ["4/5", "3/4", "5/4", "5/3"],
                     correct: 0,
-                    explanation: "sin θ = 3/5이므로 대변:빗변 = 3:5입니다.\n피타고라스 정리로 인변을 구하면: 인변 = √(5² - 3²) = 4\n따라서 cos θ = 인변/빗변 = 4/5입니다.",
+                    explanation: "sin θ = 3/5이므로 대변:빗변 = 3:5입니다.\n피타고라스 정리로 인변을 구하면: 인변 = √(5² - 3²) = √(25 - 9) = √16 = 4\n따라서 cos θ = 인변/빗변 = 4/5입니다.",
                     hint: "sin²θ + cos²θ = 1 또는 피타고라스 정리를 이용해보세요."
                 },
                 {
                     title: "계산 문제 2",
-                    text: "직각삼각형에서 cos A = 12/13일 때, tan A의 값은?",
-                    image: createTriangleImage("13", "5", "12", "A"),
-                    options: ["5/12", "12/5", "5/13", "13/5"],
+                    text: "직각삼각형 ABC에서 ∠C = 90°이고, ∠A = β, AB = 13, BC = 5일 때, tan β는?",
+                    image: "",
+                    options: ["5/12", "12/5", "5/13", "12/13"],
                     correct: 0,
-                    explanation: "cos A = 12/13이므로 인변:빗변 = 12:13입니다.\n피타고라스 정리로 대변을 구하면: 대변 = √(13² - 12²) = 5\n따라서 tan A = 대변/인변 = 5/12입니다.",
-                    hint: "피타고라스 정리를 사용해서 대변을 구해보세요."
+                    explanation: "∠C = 90°이므로 AB가 빗변입니다.\n피타고라스 정리로 AC를 구하면: AC = √(AB² - BC²) = √(13² - 5²) = √(169 - 25) = 12\n각 A(β)에서 보면 대변은 BC = 5, 인변은 AC = 12이므로\ntan β = 대변/인변 = 5/12입니다.",
+                    hint: "∠C = 90°이므로 AB가 빗변이에요. 각 β에서 대변과 인변을 찾아보세요."
                 }
             ],
             special: [
                 {
                     title: "특수각 1",
                     text: "sin 30°의 값은?",
-                    image: '<div style="text-align: center;"><svg width="200" height="120" viewBox="0 0 200 120"><polygon points="20,100 180,100 100,20" fill="rgba(79, 172, 254, 0.1)" stroke="#4facfe" stroke-width="2"/><text x="100" y="115" text-anchor="middle" font-size="12" fill="#333">2</text><text x="190" y="65" text-anchor="middle" font-size="12" fill="#333">1</text><text x="55" y="55" text-anchor="middle" font-size="12" fill="#333">√3</text><text x="30" y="90" font-size="14" fill="#e74c3c" font-weight="bold">30°</text></svg></div>',
+                    image: "",
                     options: ["1/2", "√2/2", "√3/2", "1"],
                     correct: 0,
                     explanation: "30-60-90 삼각형에서 변의 비는 1:√3:2입니다.\n30° 각에서 대변:빗변 = 1:2이므로 sin 30° = 1/2입니다.",
@@ -586,12 +554,21 @@
                 },
                 {
                     title: "특수각 2",
-                    text: "cos 60°의 값은?",
-                    image: '<div style="text-align: center;"><svg width="200" height="120" viewBox="0 0 200 120"><polygon points="20,100 180,100 100,20" fill="rgba(79, 172, 254, 0.1)" stroke="#4facfe" stroke-width="2"/><text x="100" y="115" text-anchor="middle" font-size="12" fill="#333">2</text><text x="190" y="65" text-anchor="middle" font-size="12" fill="#333">√3</text><text x="55" y="55" text-anchor="middle" font-size="12" fill="#333">1</text><text x="165" y="90" font-size="14" fill="#e74c3c" font-weight="bold">60°</text></svg></div>',
-                    options: ["1/2", "√3/2", "√2/2", "1"],
-                    correct: 0,
-                    explanation: "30-60-90 삼각형에서 변의 비는 1:√3:2입니다.\n60° 각에서 인변:빗변 = 1:2이므로 cos 60° = 1/2입니다.",
-                    hint: "60° 각에서 인변과 빗변의 비율을 생각해보세요."
+                    text: "cos 45°의 값은?",
+                    image: "",
+                    options: ["1/2", "√2/2", "√3/2", "1"],
+                    correct: 1,
+                    explanation: "45-45-90 삼각형에서 변의 비는 1:1:√2입니다.\n45° 각에서 인변:빗변 = 1:√2이므로 cos 45° = 1/√2 = √2/2입니다.",
+                    hint: "45-45-90 직각삼각형은 이등변직각삼각형이에요. 변의 비는 1:1:√2입니다."
+                },
+                {
+                    title: "특수각 3",
+                    text: "tan 60°의 값은?",
+                    image: "",
+                    options: ["1/2", "√2", "√3", "1/√3"],
+                    correct: 2,
+                    explanation: "30-60-90 삼각형에서 변의 비는 1:√3:2입니다.\n60° 각에서 대변:인변 = √3:1이므로 tan 60° = √3입니다.",
+                    hint: "60° 각에서 대변과 인변의 비를 생각해보세요."
                 }
             ],
             application: [
@@ -603,50 +580,43 @@
                     correct: 0,
                     explanation: "tan θ = 대변/인변 = 건물높이/거리 = 20/50 = 2/5입니다.",
                     hint: "건물의 높이가 대변, 건물로부터의 거리가 인변이에요."
-                },
-                {
-                    title: "활용 문제 2",
-                    text: "사다리가 벽에 기대어져 있고, 바닥과 30° 각을 이룹니다. 사다리의 길이가 4m일 때, 사다리의 윗끝이 벽에 닿는 높이는?",
-                    image: '<div style="text-align: center;"><svg width="200" height="150" viewBox="0 0 200 150"><line x1="20" y1="120" x2="160" y2="120" stroke="#333" stroke-width="2"/><line x1="160" y1="120" x2="160" y2="20" stroke="#666" stroke-width="5"/><line x1="20" y1="120" x2="160" y2="20" stroke="#e74c3c" stroke-width="4"/><text x="90" y="75" font-size="12" fill="#e74c3c" font-weight="bold">4m</text><text x="30" y="110" font-size="12" fill="#e74c3c" font-weight="bold">30°</text><text x="170" y="70" font-size="12" fill="#333">높이 = ?</text></svg></div>',
-                    options: ["2m", "2√3m", "4m", "4√3m"],
-                    correct: 0,
-                    explanation: "사다리와 바닥이 30° 각을 이루므로, 높이는 빗변에 sin 30°를 곱하면 됩니다.\n높이 = 4 × sin 30° = 4 × (1/2) = 2m입니다.",
-                    hint: "사다리가 빗변이고, 높이가 대변입니다. sin 30° = 1/2를 이용해보세요."
                 }
             ],
             mixed: [
                 {
                     title: "종합 문제 1",
-                    text: "직각삼각형에서 빗변이 13, 한 변이 5일 때, 예각의 사인값은?",
-                    image: createTriangleImage("13", "12", "5", "A"),
+                    text: "직각삼각형 ABC에서 ∠B = 90°이고, AC가 빗변이며 AC = 13, AB = 5일 때, sin A의 값은?",
+                    image: "",
                     options: ["5/13", "12/13", "5/12", "12/5"],
                     correct: 1,
-                    explanation: "피타고라스 정리로 다른 변: √(13² - 5²) = 12\nsin A = 대변/빗변 = 12/13입니다.",
-                    hint: "피타고라스 정리로 나머지 한 변을 구해보세요."
+                    explanation: "∠B = 90°이므로 AC가 빗변입니다.\n피타고라스 정리로 BC를 구하면: BC = √(AC² - AB²) = √(13² - 5²) = √(169 - 25) = √144 = 12\n각 A에서 보면 대변은 BC = 12, 빗변은 AC = 13이므로\nsin A = 대변/빗변 = 12/13입니다.",
+                    hint: "∠B = 90°이므로 AC가 빗변이에요. 피타고라스 정리로 먼저 나머지 한 변을 구해보세요."
                 },
                 {
                     title: "종합 문제 2",
-                    text: "직각삼각형에서 한 예각이 θ이고, sin θ + cos θ = 7/5일 때, sin θ × cos θ의 값은?",
-                    image: '<div style="text-align: center; padding: 20px;"><div style="background: #f8f9ff; padding: 20px; border-radius: 10px; border: 2px solid #4facfe;"><p style="font-size: 16px; color: #333; margin: 0;"><strong>주어진 조건:</strong><br>sin θ + cos θ = 7/5</p></div></div>',
-                    options: ["12/25", "24/25", "7/25", "49/25"],
-                    correct: 0,
-                    explanation: "(sin θ + cos θ)² = sin²θ + 2sin θ cos θ + cos²θ = 1 + 2sin θ cos θ\n(7/5)² = 1 + 2sin θ cos θ\n49/25 = 1 + 2sin θ cos θ\n2sin θ cos θ = 49/25 - 1 = 24/25\n따라서 sin θ cos θ = 12/25",
-                    hint: "(sin θ + cos θ)²를 전개해보세요. sin²θ + cos²θ = 1임을 이용하세요."
+                    text: "직각삼각형 ABC에서 ∠C = 90°이고, ∠A = α, AB = 25, BC = 15일 때, cos α + sin α의 값은?",
+                    image: "",
+                    options: ["1", "7/5", "4/5", "3/5"],
+                    correct: 1,
+                    explanation: "∠C = 90°이므로 AB가 빗변입니다.\n피타고라스 정리로 AC를 구하면: AC = √(AB² - BC²) = √(25² - 15²) = √(625 - 225) = √400 = 20\n각 A(α)에서:\n• 대변 = BC = 15, 인변 = AC = 20, 빗변 = AB = 25\n• sin α = 15/25 = 3/5\n• cos α = 20/25 = 4/5\n따라서 cos α + sin α = 4/5 + 3/5 = 7/5입니다.",
+                    hint: "각각의 삼각비를 구한 후 더해보세요. ∠C = 90°임을 잊지 마세요."
                 },
                 {
                     title: "종합 문제 3",
-                    text: "삼각형 ABC에서 ∠C = 90°, ∠A = 30°, BC = 6일 때, AB의 길이는?",
-                    image: createTriangleImage("AB", "6", "6√3", "30°"),
-                    options: ["12", "6√3", "4√3", "3√3"],
+                    text: "특수각을 이용하여 sin 30° + cos 60°의 값은?",
+                    image: "",
+                    options: ["1", "√3/2", "1/2", "√3"],
                     correct: 0,
-                    explanation: "∠A = 30°이고 BC가 대변이므로,\nsin 30° = BC/AB = 6/AB\n1/2 = 6/AB\nAB = 12입니다.",
-                    hint: "30° 각에서 대변과 빗변의 관계를 생각해보세요."
+                    explanation: "특수각의 값을 이용하면:\nsin 30° = 1/2이고, cos 60° = 1/2이므로\nsin 30° + cos 60° = 1/2 + 1/2 = 1입니다.",
+                    hint: "특수각의 삼각비 값을 기억해보세요. sin 30° = cos 60° = 1/2입니다."
                 }
             ]
         };
 
         // 주제 선택 함수
         function selectTopic(topic) {
+            console.log('selectTopic 호출됨:', topic); // 디버그용
+            
             document.querySelectorAll('.topic-item').forEach(item => {
                 item.classList.remove('active');
             });
@@ -659,10 +629,39 @@
             currentTopic = topic;
             currentProblemIndex = 0;
             
-            document.getElementById('welcomeScreen').style.display = 'none';
-            document.getElementById('problemCard').style.display = 'block';
-            document.getElementById('topicComplete').style.display = 'none';
-            document.getElementById('problemCard').classList.add('active');
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            const problemCard = document.getElementById('problemCard');
+            
+            if (welcomeScreen) welcomeScreen.style.display = 'none';
+            if (problemCard) {
+                problemCard.style.display = 'block';
+                
+                // 기본 문제 구조로 초기화
+                problemCard.innerHTML = `
+                    <h3 class="problem-title" id="problemTitle">문제</h3>
+                    <div class="problem-image" id="problemImage"></div>
+                    <div class="problem-text" id="problemText">문제 내용이 여기에 표시됩니다.</div>
+                    <div class="options" id="optionsContainer"></div>
+                    <div class="buttons">
+                        <button class="btn btn-secondary" id="hintBtn">💡 힌트</button>
+                        <button class="btn btn-primary" id="checkBtn" disabled>정답 확인</button>
+                        <button class="btn btn-primary" id="nextBtn" style="display: none;">다음 문제</button>
+                    </div>
+                    <div class="feedback" id="feedback">
+                        <div id="feedbackText"></div>
+                        <div class="explanation" id="explanation"></div>
+                    </div>
+                `;
+                
+                // 이벤트 리스너 다시 연결
+                const hintBtn = document.getElementById('hintBtn');
+                const checkBtn = document.getElementById('checkBtn');
+                const nextBtn = document.getElementById('nextBtn');
+                
+                if (hintBtn) hintBtn.addEventListener('click', showHint);
+                if (checkBtn) checkBtn.addEventListener('click', checkAnswer);
+                if (nextBtn) nextBtn.addEventListener('click', nextProblem);
+            }
             
             showProblem();
         }
@@ -677,27 +676,31 @@
 
             const problem = problems[currentProblemIndex];
             
-            document.getElementById('problemTitle').textContent = problem.title;
-            document.getElementById('problemText').textContent = problem.text;
-            document.getElementById('problemImage').innerHTML = problem.image || '';
-            
+            const titleElement = document.getElementById('problemTitle');
+            const textElement = document.getElementById('problemText');
+            const imageElement = document.getElementById('problemImage');
             const optionsContainer = document.getElementById('optionsContainer');
-            optionsContainer.innerHTML = '';
+            const feedbackElement = document.getElementById('feedback');
             
-            problem.options.forEach((option, index) => {
-                const optionDiv = document.createElement('div');
-                optionDiv.className = 'option';
-                optionDiv.textContent = option;
-                optionDiv.onclick = () => selectOption(index);
-                optionsContainer.appendChild(optionDiv);
-            });
+            if (titleElement) titleElement.textContent = problem.title;
+            if (textElement) textElement.textContent = problem.text;
+            if (imageElement) imageElement.innerHTML = problem.image || '';
+            
+            if (optionsContainer) {
+                optionsContainer.innerHTML = '';
+                
+                problem.options.forEach((option, index) => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'option';
+                    optionDiv.textContent = option;
+                    optionDiv.onclick = () => selectOption(index);
+                    optionsContainer.appendChild(optionDiv);
+                });
+            }
             
             resetButtons();
             selectedAnswer = null;
-            document.getElementById('feedback').style.display = 'none';
-            
-            // 진행률 업데이트
-            updateProgress();
+            if (feedbackElement) feedbackElement.style.display = 'none';
         }
 
         // 선택지 선택
@@ -706,9 +709,16 @@
                 opt.classList.remove('selected');
             });
             
-            document.querySelectorAll('.option')[index].classList.add('selected');
-            selectedAnswer = index;
-            document.getElementById('checkBtn').disabled = false;
+            const options = document.querySelectorAll('.option');
+            if (options[index]) {
+                options[index].classList.add('selected');
+                selectedAnswer = index;
+                
+                const checkBtn = document.getElementById('checkBtn');
+                if (checkBtn) {
+                    checkBtn.disabled = false;
+                }
+            }
         }
 
         // 힌트 표시
@@ -732,17 +742,7 @@
                 stats.currentStreak = 0;
             }
             
-            // 주제별 통계 업데이트
-            if (!topicStats[currentTopic]) {
-                topicStats[currentTopic] = { solved: 0, correct: 0 };
-            }
-            topicStats[currentTopic].solved++;
-            if (isCorrect) {
-                topicStats[currentTopic].correct++;
-            }
-            
             document.querySelectorAll('.option').forEach((opt, index) => {
-                opt.onclick = null; // 클릭 비활성화
                 if (index === problem.correct) {
                     opt.classList.add('correct');
                 } else if (index === selectedAnswer && !isCorrect) {
@@ -753,15 +753,26 @@
             const feedback = document.getElementById('feedback');
             const feedbackText = document.getElementById('feedbackText');
             const explanation = document.getElementById('explanation');
+            const checkBtn = document.getElementById('checkBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const hintBtn = document.getElementById('hintBtn');
             
-            feedback.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
-            feedbackText.textContent = isCorrect ? '🎉 정답입니다!' : '❌ 틀렸습니다.';
-            explanation.textContent = problem.explanation;
-            feedback.style.display = 'block';
+            if (feedback) {
+                feedback.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
+                feedback.style.display = 'block';
+            }
             
-            document.getElementById('checkBtn').style.display = 'none';
-            document.getElementById('nextBtn').style.display = 'inline-block';
-            document.getElementById('hintBtn').style.display = 'none';
+            if (feedbackText) {
+                feedbackText.textContent = isCorrect ? '🎉 정답입니다!' : '❌ 틀렸습니다.';
+            }
+            
+            if (explanation) {
+                explanation.textContent = problem.explanation;
+            }
+            
+            if (checkBtn) checkBtn.style.display = 'none';
+            if (nextBtn) nextBtn.style.display = 'inline-block';
+            if (hintBtn) hintBtn.style.display = 'none';
             
             updateStats();
         }
@@ -774,55 +785,264 @@
 
         // 버튼 상태 초기화
         function resetButtons() {
-            document.getElementById('checkBtn').style.display = 'inline-block';
-            document.getElementById('checkBtn').disabled = true;
-            document.getElementById('nextBtn').style.display = 'none';
-            document.getElementById('hintBtn').style.display = 'inline-block';
-        }
-
-        // 주제 완료 화면
-        function showTopicComplete() {
-            document.getElementById('problemCard').style.display = 'none';
-            document.getElementById('topicComplete').style.display = 'block';
+            const checkBtn = document.getElementById('checkBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const hintBtn = document.getElementById('hintBtn');
             
-            // 완료된 주제 표시
-            const topicItem = document.querySelector(`[data-topic="${currentTopic}"]`);
-            if (topicItem) {
-                topicItem.classList.add('completed');
+            if (checkBtn) {
+                checkBtn.style.display = 'inline-block';
+                checkBtn.disabled = true;
+            }
+            
+            if (nextBtn) {
+                nextBtn.style.display = 'none';
+            }
+            
+            if (hintBtn) {
+                hintBtn.style.display = 'inline-block';
             }
         }
 
-        // 웰컴 화면으로 돌아가기
-        function returnToWelcome() {
-            document.getElementById('topicComplete').style.display = 'none';
+        // 통계 업데이트
+        function updateStats() {
+            const totalSolvedElement = document.getElementById('totalSolved');
+            const correctRateElement = document.getElementById('correctRate');
+            const currentStreakElement = document.getElementById('currentStreak');
+            const progressFillElement = document.getElementById('progressFill');
+            
+            if (totalSolvedElement) {
+                totalSolvedElement.textContent = stats.totalSolved;
+            }
+            
+            if (correctRateElement) {
+                correctRateElement.textContent = 
+                    stats.totalSolved > 0 ? Math.round((stats.correctAnswers / stats.totalSolved) * 100) + '%' : '0%';
+            }
+            
+            if (currentStreakElement) {
+                currentStreakElement.textContent = stats.currentStreak;
+            }
+            
+            if (progressFillElement) {
+                const totalProblems = Object.values(problemSets).reduce((sum, problems) => sum + problems.length, 0);
+                const progress = (stats.totalSolved / totalProblems) * 100;
+                progressFillElement.style.width = progress + '%';
+            }
+        }
+
+        // 주제 완료 표시
+        function showTopicComplete() {
+            const correctRate = stats.totalSolved > 0 ? Math.round((stats.correctAnswers / stats.totalSolved) * 100) : 0;
+            
+            // 모든 주제에 66% 기준 적용
+            if (correctRate < 66) {
+                const retryButtonText = currentTopic === 'basic' ? '기본 개념 다시 풀기' : 
+                                      currentTopic === 'calculation' ? '삼각비 계산 다시 풀기' :
+                                      currentTopic === 'special' ? '특수각 다시 풀기' :
+                                      currentTopic === 'application' ? '활용 문제 다시 풀기' :
+                                      '종합 문제 다시 풀기';
+                
+                document.getElementById('problemCard').innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <h2 style="color: #e74c3c; margin-bottom: 20px;">🔄 재도전이 필요해요!</h2>
+                        <p style="font-size: 1.2em; margin-bottom: 20px;">
+                            현재 정답률: <strong style="color: #e74c3c;">${correctRate}%</strong>
+                        </p>
+                        <p style="font-size: 1.1em; margin-bottom: 30px; line-height: 1.6;">
+                            이 주제는 66% 이상의 정답률이 필요합니다.<br>
+                            더 탄탄한 이해를 위해 다시 도전해보세요! 💪<br>
+                            반복 학습으로 더 좋은 결과를 얻을 수 있어요!
+                        </p>
+                        <div style="display: flex; gap: 15px; justify-content: center;">
+                            <button class="btn btn-primary" onclick="retryCurrentTopic()">${retryButtonText}</button>
+                            <button class="btn btn-secondary" onclick="goToWelcome()">주제 선택하기</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // 66% 이상 달성 시 다음 주제 추천
+                let nextTopicButtons = '';
+                let congratsMessage = '';
+                
+                switch(currentTopic) {
+                    case 'basic':
+                        congratsMessage = '기본 개념을 완료했습니다! 이제 다음 단계로 넘어갈 준비가 되었어요!';
+                        nextTopicButtons = `
+                            <button class="btn btn-primary" onclick="goToCalculation()">삼각비 계산</button>
+                            <button class="btn btn-primary" onclick="goToSpecial()">특수각</button>
+                        `;
+                        break;
+                    case 'calculation':
+                        congratsMessage = '삼각비 계산을 완료했습니다! 다른 영역도 도전해보세요!';
+                        nextTopicButtons = `
+                            <button class="btn btn-primary" onclick="goToSpecial()">특수각</button>
+                            <button class="btn btn-primary" onclick="goToApplication()">활용 문제</button>
+                        `;
+                        break;
+                    case 'special':
+                        congratsMessage = '특수각을 완료했습니다! 실생활 응용 문제에 도전해보세요!';
+                        nextTopicButtons = `
+                            <button class="btn btn-primary" onclick="goToApplication()">활용 문제</button>
+                            <button class="btn btn-primary" onclick="goToMixed()">종합 문제</button>
+                        `;
+                        break;
+                    case 'application':
+                        congratsMessage = '활용 문제를 완료했습니다! 마지막 단계에 도전해보세요!';
+                        nextTopicButtons = `
+                            <button class="btn btn-primary" onclick="goToMixed()">종합 문제</button>
+                        `;
+                        break;
+                    case 'mixed':
+                        congratsMessage = '모든 과정을 완료했습니다! 삼각비 마스터가 되셨네요!';
+                        nextTopicButtons = '';
+                        break;
+                }
+                
+                document.getElementById('problemCard').innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <h2 style="color: #27ae60; margin-bottom: 20px;">🎉 주제 완료!</h2>
+                        <p style="font-size: 1.2em; margin-bottom: 20px;">
+                            현재 정답률: <strong style="color: #27ae60;">${correctRate}%</strong>
+                        </p>
+                        <p style="font-size: 1.1em; margin-bottom: 30px; line-height: 1.6;">
+                            ${congratsMessage}
+                        </p>
+                        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                            ${nextTopicButtons}
+                            <button class="btn btn-secondary" onclick="goToWelcome()">주제 선택하기</button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            const completedItem = document.querySelector(`[data-topic="${currentTopic}"]`);
+            if (completedItem && correctRate >= 66) {
+                completedItem.classList.add('completed');
+            }
+        }
+
+        // 각 주제로 이동하는 개별 함수들
+        function goToCalculation() {
+            console.log('goToCalculation 호출됨'); // 디버그용
+            selectTopic('calculation');
+        }
+
+        function goToSpecial() {
+            console.log('goToSpecial 호출됨'); // 디버그용
+            selectTopic('special');
+        }
+
+        function goToApplication() {
+            console.log('goToApplication 호출됨'); // 디버그용
+            selectTopic('application');
+        }
+
+        function goToMixed() {
+            console.log('goToMixed 호출됨'); // 디버그용
+            selectTopic('mixed');
+        }
+
+        // 현재 주제 재도전 함수
+        function retryCurrentTopic() {
+            console.log('retryCurrentTopic 실행, currentTopic:', currentTopic); // 디버그용
+            
+            // 통계 초기화
+            stats.totalSolved = 0;
+            stats.correctAnswers = 0;
+            stats.currentStreak = 0;
+            
+            // 현재 주제 다시 시작
+            currentProblemIndex = 0;
+            
+            // 모든 주제 항목에서 active 클래스 제거
+            document.querySelectorAll('.topic-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // 현재 주제 항목을 활성화
+            const currentItem = document.querySelector(`[data-topic="${currentTopic}"]`);
+            if (currentItem) {
+                currentItem.classList.remove('completed');
+                currentItem.classList.add('active');
+            }
+            
+            // 환영 화면 숨기고 문제 카드 표시
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            const problemCard = document.getElementById('problemCard');
+            
+            if (welcomeScreen) welcomeScreen.style.display = 'none';
+            if (problemCard) {
+                problemCard.style.display = 'block';
+                // 기존 완료 메시지 내용을 초기화
+                problemCard.innerHTML = `
+                    <h3 class="problem-title" id="problemTitle">문제</h3>
+                    <div class="problem-image" id="problemImage"></div>
+                    <div class="problem-text" id="problemText">문제 내용이 여기에 표시됩니다.</div>
+                    <div class="options" id="optionsContainer"></div>
+                    <div class="buttons">
+                        <button class="btn btn-secondary" id="hintBtn">💡 힌트</button>
+                        <button class="btn btn-primary" id="checkBtn" disabled>정답 확인</button>
+                        <button class="btn btn-primary" id="nextBtn" style="display: none;">다음 문제</button>
+                    </div>
+                    <div class="feedback" id="feedback">
+                        <div id="feedbackText"></div>
+                        <div class="explanation" id="explanation"></div>
+                    </div>
+                `;
+                
+                // 이벤트 리스너 다시 연결
+                const hintBtn = document.getElementById('hintBtn');
+                const checkBtn = document.getElementById('checkBtn');
+                const nextBtn = document.getElementById('nextBtn');
+                
+                if (hintBtn) hintBtn.addEventListener('click', showHint);
+                if (checkBtn) checkBtn.addEventListener('click', checkAnswer);
+                if (nextBtn) nextBtn.addEventListener('click', nextProblem);
+            }
+            
+            // 통계 업데이트
+            updateStats();
+            
+            // 첫 문제 표시
+            showProblem();
+        }
+
+        // 환영 화면으로 돌아가기
+        function goToWelcome() {
             document.getElementById('problemCard').style.display = 'none';
             document.getElementById('welcomeScreen').style.display = 'block';
-            
-            // 모든 주제 선택 해제
             document.querySelectorAll('.topic-item').forEach(item => {
                 item.classList.remove('active');
             });
         }
 
-        // 통계 업데이트
-        function updateStats() {
-            document.getElementById('totalSolved').textContent = stats.totalSolved;
-            document.getElementById('correctRate').textContent = 
-                stats.totalSolved > 0 ? Math.round((stats.correctAnswers / stats.totalSolved) * 100) + '%' : '0%';
-            document.getElementById('currentStreak').textContent = stats.currentStreak;
-        }
-
-        // 진행률 업데이트
-        function updateProgress() {
-            const totalProblems = Object.values(problemSets).reduce((sum, problems) => sum + problems.length, 0);
-            const progress = stats.totalSolved / totalProblems * 100;
-            document.getElementById('progressFill').style.width = progress + '%';
-        }
-
-        // 초기화
+        // 이벤트 리스너 설정
         document.addEventListener('DOMContentLoaded', function() {
+            // 주제 항목 클릭 이벤트
+            document.querySelectorAll('.topic-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const topic = this.getAttribute('data-topic');
+                    selectTopic(topic);
+                });
+            });
+
+            // 시작 버튼 클릭 이벤트
+            document.querySelector('.start-btn').addEventListener('click', function() {
+                const topic = this.getAttribute('data-topic');
+                selectTopic(topic);
+            });
+
+            // 힌트 버튼 클릭 이벤트
+            document.getElementById('hintBtn').addEventListener('click', showHint);
+
+            // 정답 확인 버튼 클릭 이벤트
+            document.getElementById('checkBtn').addEventListener('click', checkAnswer);
+
+            // 다음 문제 버튼 클릭 이벤트
+            document.getElementById('nextBtn').addEventListener('click', nextProblem);
+
+            // 초기 통계 표시
             updateStats();
-            updateProgress();
         });
     </script>
 </body>
