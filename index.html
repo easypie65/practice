@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>중3 삼각비 총복습 - 맞춤형 문제은행</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .progress-section {
+            padding: 20px 30px;
+            background: #f8f9ff;
+            border-bottom: 1px solid #e0e6ff;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e6ff;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .stat {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            min-width: 120px;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .main-content {
+            display: flex;
+            min-height: 600px;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: #f8f9ff;
+            padding: 30px;
+            border-right: 1px solid #e0e6ff;
+        }
+
+        .topic-list {
+            list-style: none;
+        }
+
+        .topic-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .topic-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .topic-item.active {
+            border-color: #4facfe;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .topic-item.completed::after {
+            content: '✓';
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            color: #4caf50;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .problem-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .problem-card.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .problem-title {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .problem-image {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .problem-text {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #555;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e0e6ff;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 1.1em;
+        }
+
+        .option:hover {
+            border-color: #4facfe;
+            background: #f8f9ff;
+        }
+
+        .option.selected {
+            border-color: #4facfe;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .option.correct {
+            border-color: #4caf50;
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .option.wrong {
+            border-color: #f44336;
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f0f2f5;
+            color: #666;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: #e8f5e8;
+            border: 2px solid #4caf50;
+            color: #2e7d32;
+        }
+
+        .feedback.wrong {
+            background: #ffebee;
+            border: 2px solid #f44336;
+            color: #c62828;
+        }
+
+        .explanation {
+            margin-top: 15px;
+            font-size: 1em;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+
+        .reference-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .reference-title {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .formulas {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .formula {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .welcome-screen {
+            text-align: center;
+        }
+
+        .welcome-title {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .welcome-text {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(79, 172, 254, 0.4);
+        }
+
+        .topic-complete {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .complete-title {
+            font-size: 2.2em;
+            color: #4caf50;
+            margin-bottom: 20px;
+        }
+
+        .complete-message {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔺 삼각비 마스터</h1>
+            <p>중학교 3학년 삼각비 총 복습 - 맞춤형 문제은행</p>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number" id="totalSolved">0</div>
+                    <div>해결한 문제</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="correctRate">0%</div>
+                    <div>정답률</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="currentStreak">0</div>
+                    <div>연속 정답</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="reference-card">
+                    <div class="reference-title">📐 삼각비 공식</div>
+                    <div class="formulas">
+                        <div class="formula">sin θ = 대변/빗변</div>
+                        <div class="formula">cos θ = 인변/빗변</div>
+                        <div class="formula">tan θ = 대변/인변</div>
+                    </div>
+                </div>
+                
+                <ul class="topic-list">
+                    <li class="topic-item" data-topic="basic" onclick="selectTopic('basic')">
+                        <strong>기본 개념</strong>
+                        <div style="font-size: 0.9em; color: #666; margin-top: 5px;">삼각비의 정의와 기본 개념</div>
+                    </li>
+                    <li class="topic-item" data-topic="calculation" onclick="selectTopic('calculation')">
+                        <strong>삼각비 계산</strong>
+                        <div style="font-size: 0.9em; color: #666; margin-top: 5px;">주어진 조건으로 삼각비 구하기</div>
+                    </li>
+                    <li class="topic-item" data-topic="special" onclick="selectTopic('special')">
+                        <strong>특수각</strong>
+                        <div style="font-size: 0.9em; color: #666; margin-top: 5px;">30°, 45°, 60° 삼각비</div>
+                    </li>
+                    <li class="topic-item" data-topic="application" onclick="selectTopic('application')">
+                        <strong>활용 문제</strong>
+                        <div style="font-size: 0.9em; color: #666; margin-top: 5px;">실생활 문제 해결하기</div>
+                    </li>
+                    <li class="topic-item" data-topic="mixed" onclick="selectTopic('mixed')">
+                        <strong>종합 문제</strong>
+                        <div style="font-size: 0.9em; color: #666; margin-top: 5px;">모든 내용을 종합한 문제</div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="content-area">
+                <div id="welcomeScreen" class="welcome-screen">
+                    <h2 class="welcome-title">삼각비 총복습을 시작해보세요! 🚀</h2>
+                    <p class="welcome-text">
+                        왼쪽에서 학습하고 싶은 주제를 선택하면<br>
+                        맞춤형 문제들이 차례대로 나타납니다.<br>
+                        각 문제마다 자세한 해설과 함께 실력을 키워보세요!
+                    </p>
+                    <button class="start-btn" onclick="selectTopic('basic')">기본 개념부터 시작하기</button>
+                </div>
+
+                <div id="problemCard" class="problem-card">
+                    <h3 class="problem-title" id="problemTitle">문제</h3>
+                    <div class="problem-image" id="problemImage"></div>
+                    <div class="problem-text" id="problemText">문제 내용이 여기에 표시됩니다.</div>
+                    <div class="options" id="optionsContainer"></div>
+                    <div class="buttons">
+                        <button class="btn btn-secondary" id="hintBtn" onclick="showHint()">💡 힌트</button>
+                        <button class="btn btn-primary" id="checkBtn" onclick="checkAnswer()" disabled>정답 확인</button>
+                        <button class="btn btn-primary" id="nextBtn" onclick="nextProblem()" style="display: none;">다음 문제</button>
+                    </div>
+                    <div class="feedback" id="feedback">
+                        <div id="feedbackText"></div>
+                        <div class="explanation" id="explanation"></div>
+                    </div>
+                </div>
+
+                <div id="topicComplete" class="topic-complete" style="display: none;">
+                    <h2 class="complete-title">🎉 주제 완료!</h2>
+                    <p class="complete-message">이 주제의 모든 문제를 완료했습니다.<br>다른 주제를 선택해보세요.</p>
+                    <button class="btn btn-primary" onclick="returnToWelcome()">다른 주제 선택하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수
+        let currentTopic = '';
+        let currentProblemIndex = 0;
+        let selectedAnswer = null;
+        let stats = {
+            totalSolved: 0,
+            correctAnswers: 0,
+            currentStreak: 0
+        };
+        let topicStats = {};
+
+        // 삼각형 이미지 생성 함수
+        function createTriangleImage(hypotenuse, opposite, adjacent, angle) {
+            return `
+                <svg width="250" height="180" viewBox="0 0 250 180">
+                    <polygon points="30,140 170,140 170,50" fill="rgba(79, 172, 254, 0.1)" stroke="#4facfe" stroke-width="3"/>
+                    <rect x="162" y="132" width="8" height="8" fill="none" stroke="#666" stroke-width="1"/>
+                    <path d="M 40,140 A 10,10 0 0,0 47,133" fill="none" stroke="#e74c3c" stroke-width="2"/>
+                    <text x="50" y="132" font-size="16" fill="#e74c3c" font-weight="bold">${angle}</text>
+                    <text x="100" y="155" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">인변 = ${adjacent}</text>
+                    <text x="185" y="95" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">대변 = ${opposite}</text>
+                    <text x="95" y="90" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">빗변 = ${hypotenuse}</text>
+                    <circle cx="30" cy="140" r="3" fill="#e74c3c"/>
+                    <circle cx="170" cy="140" r="3" fill="#2c3e50"/>
+                    <circle cx="170" cy="50" r="3" fill="#2c3e50"/>
+                    <text x="25" y="155" font-size="16" fill="#e74c3c" font-weight="bold">A</text>
+                    <text x="175" y="155" font-size="16" fill="#2c3e50" font-weight="bold">B</text>
+                    <text x="175" y="45" font-size="16" fill="#2c3e50" font-weight="bold">C</text>
+                    <text x="150" y="155" font-size="12" fill="#666">90°</text>
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c"/>
+                        </marker>
+                    </defs>
+                    <path d="M 45,125 Q 55,120 45,115" fill="none" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrowhead)"/>
+                </svg>
+            `;
+        }
+
+        // 문제 데이터
+        const problemSets = {
+            basic: [
+                {
+                    title: "기본 개념 1",
+                    text: "직각삼각형 ABC에서 ∠A = θ일 때, sin θ의 값은?",
+                    image: createTriangleImage("10", "6", "8", "θ"),
+                    options: ["0.6", "0.8", "0.75", "1.2"],
+                    correct: 0,
+                    explanation: "각 A에서 보면 대변은 BC = 6, 빗변은 AC = 10이므로\nsin θ = sin A = 대변/빗변 = 6/10 = 0.6입니다.",
+                    hint: "각 A(θ)에서 대변은 맞은편 변 BC이고, 빗변은 AC입니다. sin θ = 대변/빗변이에요."
+                },
+                {
+                    title: "기본 개념 2",
+                    text: "직각삼각형 ABC에서 ∠A = θ일 때, cos θ의 값은?",
+                    image: createTriangleImage("10", "6", "8", "θ"),
+                    options: ["0.6", "0.8", "1.25", "0.75"],
+                    correct: 1,
+                    explanation: "각 A에서 보면 인변은 AB = 8, 빗변은 AC = 10이므로\ncos θ = cos A = 인변/빗변 = 8/10 = 0.8입니다.",
+                    hint: "각 A(θ)에서 인변은 인접한 변 AB이고, 빗변은 AC입니다. cos θ = 인변/빗변이에요."
+                },
+                {
+                    title: "기본 개념 3",
+                    text: "직각삼각형 ABC에서 ∠A = θ일 때, tan θ의 값은?",
+                    image: createTriangleImage("10", "6", "8", "θ"),
+                    options: ["0.75", "1.33", "0.6", "0.8"],
+                    correct: 0,
+                    explanation: "각 A에서 보면 대변은 BC = 6, 인변은 AB = 8이므로\ntan θ = tan A = 대변/인변 = 6/8 = 0.75입니다.",
+                    hint: "각 A(θ)에서 대변은 BC, 인변은 AB입니다. tan θ = 대변/인변이에요."
+                }
+            ],
+            calculation: [
+                {
+                    title: "계산 문제 1",
+                    text: "직각삼각형에서 ∠A = θ이고, sin θ = 3/5일 때, cos θ의 값은?",
+                    image: createTriangleImage("5", "3", "4", "θ"),
+                    options: ["4/5", "3/4", "5/4", "5/3"],
+                    correct: 0,
+                    explanation: "sin θ = 3/5이므로 대변:빗변 = 3:5입니다.\n피타고라스 정리로 인변을 구하면: 인변 = √(5² - 3²) = 4\n따라서 cos θ = 인변/빗변 = 4/5입니다.",
+                    hint: "sin²θ + cos²θ = 1 또는 피타고라스 정리를 이용해보세요."
+                },
+                {
+                    title: "계산 문제 2",
+                    text: "직각삼각형에서 cos A = 12/13일 때, tan A의 값은?",
+                    image: createTriangleImage("13", "5", "12", "A"),
+                    options: ["5/12", "12/5", "5/13", "13/5"],
+                    correct: 0,
+                    explanation: "cos A = 12/13이므로 인변:빗변 = 12:13입니다.\n피타고라스 정리로 대변을 구하면: 대변 = √(13² - 12²) = 5\n따라서 tan A = 대변/인변 = 5/12입니다.",
+                    hint: "피타고라스 정리를 사용해서 대변을 구해보세요."
+                }
+            ],
+            special: [
+                {
+                    title: "특수각 1",
+                    text: "sin 30°의 값은?",
+                    image: '<div style="text-align: center;"><svg width="200" height="120" viewBox="0 0 200 120"><polygon points="20,100 180,100 100,20" fill="rgba(79, 172, 254, 0.1)" stroke="#4facfe" stroke-width="2"/><text x="100" y="115" text-anchor="middle" font-size="12" fill="#333">2</text><text x="190" y="65" text-anchor="middle" font-size="12" fill="#333">1</text><text x="55" y="55" text-anchor="middle" font-size="12" fill="#333">√3</text><text x="30" y="90" font-size="14" fill="#e74c3c" font-weight="bold">30°</text></svg></div>',
+                    options: ["1/2", "√2/2", "√3/2", "1"],
+                    correct: 0,
+                    explanation: "30-60-90 삼각형에서 변의 비는 1:√3:2입니다.\n30° 각에서 대변:빗변 = 1:2이므로 sin 30° = 1/2입니다.",
+                    hint: "30-60-90 직각삼각형을 그려보세요. 변의 비는 1:√3:2입니다."
+                },
+                {
+                    title: "특수각 2",
+                    text: "cos 60°의 값은?",
+                    image: '<div style="text-align: center;"><svg width="200" height="120" viewBox="0 0 200 120"><polygon points="20,100 180,100 100,20" fill="rgba(79, 172, 254, 0.1)" stroke="#4facfe" stroke-width="2"/><text x="100" y="115" text-anchor="middle" font-size="12" fill="#333">2</text><text x="190" y="65" text-anchor="middle" font-size="12" fill="#333">√3</text><text x="55" y="55" text-anchor="middle" font-size="12" fill="#333">1</text><text x="165" y="90" font-size="14" fill="#e74c3c" font-weight="bold">60°</text></svg></div>',
+                    options: ["1/2", "√3/2", "√2/2", "1"],
+                    correct: 0,
+                    explanation: "30-60-90 삼각형에서 변의 비는 1:√3:2입니다.\n60° 각에서 인변:빗변 = 1:2이므로 cos 60° = 1/2입니다.",
+                    hint: "60° 각에서 인변과 빗변의 비율을 생각해보세요."
+                }
+            ],
+            application: [
+                {
+                    title: "활용 문제 1",
+                    text: "높이 20m인 건물을 50m 거리에서 올려다본 각을 θ라 할 때, tan θ는?",
+                    image: '<div style="text-align: center;"><svg width="250" height="140" viewBox="0 0 250 140"><rect x="180" y="40" width="15" height="80" fill="#4facfe"/><line x1="20" y1="120" x2="220" y2="120" stroke="#333" stroke-width="2"/><line x1="50" y1="120" x2="185" y2="40" stroke="#e74c3c" stroke-width="2" stroke-dasharray="3,3"/><text x="115" y="135" text-anchor="middle" font-size="12" fill="#333">50m</text><text x="205" y="85" font-size="12" fill="#333">20m</text><text x="60" y="110" font-size="12" fill="#e74c3c" font-weight="bold">θ</text></svg></div>',
+                    options: ["2/5", "5/2", "3/4", "4/3"],
+                    correct: 0,
+                    explanation: "tan θ = 대변/인변 = 건물높이/거리 = 20/50 = 2/5입니다.",
+                    hint: "건물의 높이가 대변, 건물로부터의 거리가 인변이에요."
+                },
+                {
+                    title: "활용 문제 2",
+                    text: "사다리가 벽에 기대어져 있고, 바닥과 30° 각을 이룹니다. 사다리의 길이가 4m일 때, 사다리의 윗끝이 벽에 닿는 높이는?",
+                    image: '<div style="text-align: center;"><svg width="200" height="150" viewBox="0 0 200 150"><line x1="20" y1="120" x2="160" y2="120" stroke="#333" stroke-width="2"/><line x1="160" y1="120" x2="160" y2="20" stroke="#666" stroke-width="5"/><line x1="20" y1="120" x2="160" y2="20" stroke="#e74c3c" stroke-width="4"/><text x="90" y="75" font-size="12" fill="#e74c3c" font-weight="bold">4m</text><text x="30" y="110" font-size="12" fill="#e74c3c" font-weight="bold">30°</text><text x="170" y="70" font-size="12" fill="#333">높이 = ?</text></svg></div>',
+                    options: ["2m", "2√3m", "4m", "4√3m"],
+                    correct: 0,
+                    explanation: "사다리와 바닥이 30° 각을 이루므로, 높이는 빗변에 sin 30°를 곱하면 됩니다.\n높이 = 4 × sin 30° = 4 × (1/2) = 2m입니다.",
+                    hint: "사다리가 빗변이고, 높이가 대변입니다. sin 30° = 1/2를 이용해보세요."
+                }
+            ],
+            mixed: [
+                {
+                    title: "종합 문제 1",
+                    text: "직각삼각형에서 빗변이 13, 한 변이 5일 때, 예각의 사인값은?",
+                    image: createTriangleImage("13", "12", "5", "A"),
+                    options: ["5/13", "12/13", "5/12", "12/5"],
+                    correct: 1,
+                    explanation: "피타고라스 정리로 다른 변: √(13² - 5²) = 12\nsin A = 대변/빗변 = 12/13입니다.",
+                    hint: "피타고라스 정리로 나머지 한 변을 구해보세요."
+                },
+                {
+                    title: "종합 문제 2",
+                    text: "직각삼각형에서 한 예각이 θ이고, sin θ + cos θ = 7/5일 때, sin θ × cos θ의 값은?",
+                    image: '<div style="text-align: center; padding: 20px;"><div style="background: #f8f9ff; padding: 20px; border-radius: 10px; border: 2px solid #4facfe;"><p style="font-size: 16px; color: #333; margin: 0;"><strong>주어진 조건:</strong><br>sin θ + cos θ = 7/5</p></div></div>',
+                    options: ["12/25", "24/25", "7/25", "49/25"],
+                    correct: 0,
+                    explanation: "(sin θ + cos θ)² = sin²θ + 2sin θ cos θ + cos²θ = 1 + 2sin θ cos θ\n(7/5)² = 1 + 2sin θ cos θ\n49/25 = 1 + 2sin θ cos θ\n2sin θ cos θ = 49/25 - 1 = 24/25\n따라서 sin θ cos θ = 12/25",
+                    hint: "(sin θ + cos θ)²를 전개해보세요. sin²θ + cos²θ = 1임을 이용하세요."
+                },
+                {
+                    title: "종합 문제 3",
+                    text: "삼각형 ABC에서 ∠C = 90°, ∠A = 30°, BC = 6일 때, AB의 길이는?",
+                    image: createTriangleImage("AB", "6", "6√3", "30°"),
+                    options: ["12", "6√3", "4√3", "3√3"],
+                    correct: 0,
+                    explanation: "∠A = 30°이고 BC가 대변이므로,\nsin 30° = BC/AB = 6/AB\n1/2 = 6/AB\nAB = 12입니다.",
+                    hint: "30° 각에서 대변과 빗변의 관계를 생각해보세요."
+                }
+            ]
+        };
+
+        // 주제 선택 함수
+        function selectTopic(topic) {
+            document.querySelectorAll('.topic-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const activeItem = document.querySelector(`[data-topic="${topic}"]`);
+            if (activeItem) {
+                activeItem.classList.add('active');
+            }
+
+            currentTopic = topic;
+            currentProblemIndex = 0;
+            
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('problemCard').style.display = 'block';
+            document.getElementById('topicComplete').style.display = 'none';
+            document.getElementById('problemCard').classList.add('active');
+            
+            showProblem();
+        }
+
+        // 문제 표시 함수
+        function showProblem() {
+            const problems = problemSets[currentTopic];
+            if (!problems || currentProblemIndex >= problems.length) {
+                showTopicComplete();
+                return;
+            }
+
+            const problem = problems[currentProblemIndex];
+            
+            document.getElementById('problemTitle').textContent = problem.title;
+            document.getElementById('problemText').textContent = problem.text;
+            document.getElementById('problemImage').innerHTML = problem.image || '';
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            problem.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectOption(index);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            resetButtons();
+            selectedAnswer = null;
+            document.getElementById('feedback').style.display = 'none';
+            
+            // 진행률 업데이트
+            updateProgress();
+        }
+
+        // 선택지 선택
+        function selectOption(index) {
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            document.querySelectorAll('.option')[index].classList.add('selected');
+            selectedAnswer = index;
+            document.getElementById('checkBtn').disabled = false;
+        }
+
+        // 힌트 표시
+        function showHint() {
+            const problem = problemSets[currentTopic][currentProblemIndex];
+            alert('💡 힌트: ' + problem.hint);
+        }
+
+        // 정답 확인
+        function checkAnswer() {
+            if (selectedAnswer === null) return;
+            
+            const problem = problemSets[currentTopic][currentProblemIndex];
+            const isCorrect = selectedAnswer === problem.correct;
+            
+            stats.totalSolved++;
+            if (isCorrect) {
+                stats.correctAnswers++;
+                stats.currentStreak++;
+            } else {
+                stats.currentStreak = 0;
+            }
+            
+            // 주제별 통계 업데이트
+            if (!topicStats[currentTopic]) {
+                topicStats[currentTopic] = { solved: 0, correct: 0 };
+            }
+            topicStats[currentTopic].solved++;
+            if (isCorrect) {
+                topicStats[currentTopic].correct++;
+            }
+            
+            document.querySelectorAll('.option').forEach((opt, index) => {
+                opt.onclick = null; // 클릭 비활성화
+                if (index === problem.correct) {
+                    opt.classList.add('correct');
+                } else if (index === selectedAnswer && !isCorrect) {
+                    opt.classList.add('wrong');
+                }
+            });
+            
+            const feedback = document.getElementById('feedback');
+            const feedbackText = document.getElementById('feedbackText');
+            const explanation = document.getElementById('explanation');
+            
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
+            feedbackText.textContent = isCorrect ? '🎉 정답입니다!' : '❌ 틀렸습니다.';
+            explanation.textContent = problem.explanation;
+            feedback.style.display = 'block';
+            
+            document.getElementById('checkBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'inline-block';
+            document.getElementById('hintBtn').style.display = 'none';
+            
+            updateStats();
+        }
+
+        // 다음 문제
+        function nextProblem() {
+            currentProblemIndex++;
+            showProblem();
+        }
+
+        // 버튼 상태 초기화
+        function resetButtons() {
+            document.getElementById('checkBtn').style.display = 'inline-block';
+            document.getElementById('checkBtn').disabled = true;
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('hintBtn').style.display = 'inline-block';
+        }
+
+        // 주제 완료 화면
+        function showTopicComplete() {
+            document.getElementById('problemCard').style.display = 'none';
+            document.getElementById('topicComplete').style.display = 'block';
+            
+            // 완료된 주제 표시
+            const topicItem = document.querySelector(`[data-topic="${currentTopic}"]`);
+            if (topicItem) {
+                topicItem.classList.add('completed');
+            }
+        }
+
+        // 웰컴 화면으로 돌아가기
+        function returnToWelcome() {
+            document.getElementById('topicComplete').style.display = 'none';
+            document.getElementById('problemCard').style.display = 'none';
+            document.getElementById('welcomeScreen').style.display = 'block';
+            
+            // 모든 주제 선택 해제
+            document.querySelectorAll('.topic-item').forEach(item => {
+                item.classList.remove('active');
+            });
+        }
+
+        // 통계 업데이트
+        function updateStats() {
+            document.getElementById('totalSolved').textContent = stats.totalSolved;
+            document.getElementById('correctRate').textContent = 
+                stats.totalSolved > 0 ? Math.round((stats.correctAnswers / stats.totalSolved) * 100) + '%' : '0%';
+            document.getElementById('currentStreak').textContent = stats.currentStreak;
+        }
+
+        // 진행률 업데이트
+        function updateProgress() {
+            const totalProblems = Object.values(problemSets).reduce((sum, problems) => sum + problems.length, 0);
+            const progress = stats.totalSolved / totalProblems * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            updateProgress();
+        });
+    </script>
+</body>
+</html>
