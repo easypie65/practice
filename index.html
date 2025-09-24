@@ -505,30 +505,83 @@
             return buildings[Math.floor(Math.random() * buildings.length)];
         }
 
-        // 캡처 및 업로드 함수
-        function captureAndUpload() {
-            // 화면 캡처 (html2canvas 라이브러리 필요)
+        // 학급 선택 및 업로드 함수
+        function selectClassAndUpload() {
+            const classModal = document.createElement('div');
+            classModal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+            `;
+            
+            classModal.innerHTML = `
+                <div style="background: white; padding: 30px; border-radius: 20px; max-width: 600px; text-align: center;">
+                    <h2 style="color: #27ae60; margin-bottom: 20px;">🎉 100% 달성 축하합니다!</h2>
+                    <p style="margin-bottom: 30px; line-height: 1.6;">
+                        어느 반인지 선택하고 인증샷을 업로드해주세요!
+                    </p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px;">
+                        <button onclick="uploadToClass('3-1')" style="background: #e74c3c; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold;">3학년 1반</button>
+                        <button onclick="uploadToClass('3-2')" style="background: #f39c12; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold;">3학년 2반</button>
+                        <button onclick="uploadToClass('3-3')" style="background: #2ecc71; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold;">3학년 3반</button>
+                        <button onclick="uploadToClass('3-4')" style="background: #3498db; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold;">3학년 4반</button>
+                        <button onclick="uploadToClass('3-5')" style="background: #9b59b6; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold;">3학년 5반</button>
+                        <button onclick="uploadToClass('3-6')" style="background: #34495e; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold;">3학년 6반</button>
+                    </div>
+                    <button onclick="this.closest('div').parentElement.remove()" 
+                            style="background: #95a5a6; color: white; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer;">
+                        닫기
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(classModal);
+        }
+
+        function uploadToClass(className) {
+            const classUrls = {
+                '3-1': 'https://b.tkbell.co.kr/tkboard/woi/1243615/070Te5fM12.do?pageSeq=1909631',
+                '3-2': 'https://b.tkbell.co.kr/tkboard/woi/1243615/73eP88436t.do?pageSeq=1909634',
+                '3-3': 'https://b.tkbell.co.kr/tkboard/woi/1243615/0kbNx8eK3a.do?pageSeq=1909636',
+                '3-4': 'https://b.tkbell.co.kr/tkboard/woi/1243615/1z6bIL2c47.do?pageSeq=1909635',
+                '3-5': 'https://b.tkbell.co.kr/tkboard/woi/1243615/G2GsHEERbV.do?pageSeq=1909637',
+                '3-6': 'https://b.tkbell.co.kr/tkboard/woi/1243615/6meBlp16an.do?pageSeq=1909638'
+            };
+
+            // 기존 모달 닫기
+            document.querySelectorAll('[style*="position: fixed"]').forEach(modal => modal.remove());
+
+            // 캡처 시도
             if (typeof html2canvas !== 'undefined') {
-                html2canvas(document.body).then(canvas => {
-                    // 캔버스를 이미지로 변환
+                html2canvas(document.body, {
+                    useCORS: true,
+                    allowTaint: true,
+                    scale: 1
+                }).then(canvas => {
                     const imageData = canvas.toDataURL('image/png');
-                    
-                    // 다운로드 링크 생성
                     const link = document.createElement('a');
-                    link.download = `삼각비마스터_100%달성_${new Date().toLocaleDateString()}.png`;
+                    link.download = `삼각비마스터_100%달성_${className}_${new Date().toLocaleDateString()}.png`;
                     link.href = imageData;
                     link.click();
                     
-                    // 업로드 안내
-                    showUploadGuide();
+                    showFinalUploadGuide(className, classUrls[className]);
+                }).catch(error => {
+                    console.error('캡처 실패:', error);
+                    showFinalUploadGuide(className, classUrls[className], false);
                 });
             } else {
-                // html2canvas가 없으면 스크린샷 안내
-                showScreenshotGuide();
+                showFinalUploadGuide(className, classUrls[className], false);
             }
         }
 
-        function showUploadGuide() {
+        function showFinalUploadGuide(className, uploadUrl, captured = true) {
             const uploadModal = document.createElement('div');
             uploadModal.style.cssText = `
                 position: fixed;
@@ -545,23 +598,21 @@
             
             uploadModal.innerHTML = `
                 <div style="background: white; padding: 30px; border-radius: 20px; max-width: 500px; text-align: center;">
-                    <h2 style="color: #27ae60; margin-bottom: 20px;">🎉 100% 달성 축하합니다!</h2>
-                    <p style="margin-bottom: 20px; line-height: 1.6;">
-                        화면이 캡처되어 다운로드되었습니다!<br>
-                        <strong>3학년 6반</strong> 학생들은 아래 링크에서 인증샷을 올려주세요!
-                    </p>
+                    <h2 style="color: #27ae60; margin-bottom: 20px;">📸 ${className} 인증샷 업로드</h2>
+                    ${captured ? 
+                        '<p style="margin-bottom: 20px; color: #27ae60;">✅ 화면이 캡처되어 다운로드되었습니다!</p>' : 
+                        '<p style="margin-bottom: 20px; color: #e74c3c;">⚠️ 이 화면을 스크린샷으로 캡처해주세요!<br><small>(Windows: Win+Shift+S, Mac: Cmd+Shift+4)</small></p>'
+                    }
                     <div style="background: #f8f9ff; padding: 15px; border-radius: 10px; margin: 20px 0;">
-                        <strong>업로드 링크:</strong><br>
-                        <a href="https://b.tkbell.co.kr/tkboard/woi/1243615/6meBlp16an.do?pageSeq=1909638" 
-                           target="_blank" 
-                           style="color: #4facfe; word-break: break-all;">
-                            https://b.tkbell.co.kr/tkboard/woi/1243615/6meBlp16an.do?pageSeq=1909638
+                        <strong>${className} 업로드 링크:</strong><br>
+                        <a href="${uploadUrl}" target="_blank" style="color: #4facfe; word-break: break-all; font-size: 0.9em;">
+                            ${uploadUrl}
                         </a>
                     </div>
                     <div style="display: flex; gap: 15px; justify-content: center;">
-                        <button onclick="window.open('https://b.tkbell.co.kr/tkboard/woi/1243615/6meBlp16an.do?pageSeq=1909638', '_blank')" 
+                        <button onclick="window.open('${uploadUrl}', '_blank')" 
                                 style="background: #27ae60; color: white; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-weight: bold;">
-                            업로드하러 가기
+                            ${className} 게시판으로 가기
                         </button>
                         <button onclick="this.closest('div').parentElement.remove()" 
                                 style="background: #95a5a6; color: white; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer;">
@@ -572,55 +623,6 @@
             `;
             
             document.body.appendChild(uploadModal);
-        }
-
-        function showScreenshotGuide() {
-            const screenshotModal = document.createElement('div');
-            screenshotModal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.8);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 10000;
-            `;
-            
-            screenshotModal.innerHTML = `
-                <div style="background: white; padding: 30px; border-radius: 20px; max-width: 500px; text-align: center;">
-                    <h2 style="color: #27ae60; margin-bottom: 20px;">🎉 100% 달성 축하합니다!</h2>
-                    <p style="margin-bottom: 20px; line-height: 1.6;">
-                        이 화면을 스크린샷으로 캡처해주세요!<br>
-                        <small style="color: #666;">(Windows: Win+Shift+S, Mac: Cmd+Shift+4)</small>
-                    </p>
-                    <p style="margin-bottom: 20px;">
-                        <strong>3학년 6반</strong> 학생들은 아래 링크에서 인증샷을 올려주세요!
-                    </p>
-                    <div style="background: #f8f9ff; padding: 15px; border-radius: 10px; margin: 20px 0;">
-                        <strong>업로드 링크:</strong><br>
-                        <a href="https://b.tkbell.co.kr/tkboard/woi/1243615/6meBlp16an.do?pageSeq=1909638" 
-                           target="_blank" 
-                           style="color: #4facfe; word-break: break-all;">
-                            https://b.tkbell.co.kr/tkboard/woi/1243615/6meBlp16an.do?pageSeq=1909638
-                        </a>
-                    </div>
-                    <div style="display: flex; gap: 15px; justify-content: center;">
-                        <button onclick="window.open('https://b.tkbell.co.kr/tkboard/woi/1243615/6meBlp16an.do?pageSeq=1909638', '_blank')" 
-                                style="background: #27ae60; color: white; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-weight: bold;">
-                            업로드하러 가기
-                        </button>
-                        <button onclick="this.closest('div').parentElement.remove()" 
-                                style="background: #95a5a6; color: white; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer;">
-                            닫기
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(screenshotModal);
         }
         function saveProgress() {
             const progressData = {
@@ -1110,9 +1112,150 @@
             saveProgress();
         }
 
-        // 주제 완료 표시
+        // 모든 주제 완료 확인 (개선된 버전)
+        function checkAllTopicsCompleted() {
+            const topics = ['basic', 'calculation', 'special', 'application'];
+            console.log('완료 확인 중...'); // 디버그용
+            
+            const completedCount = topics.filter(topic => {
+                const topicItem = document.querySelector(`[data-topic="${topic}"]`);
+                const isCompleted = topicItem && topicItem.classList.contains('completed');
+                console.log(`${topic}: ${isCompleted ? '완료' : '미완료'}`); // 디버그용
+                return isCompleted;
+            }).length;
+            
+            console.log(`완료된 주제: ${completedCount}/${topics.length}`); // 디버그용
+            return completedCount === topics.length;
+        }
+
+        // 상세 진도 확인
+        function showDetailedProgress() {
+            const saved = localStorage.getItem('trigonometry_topic_stats');
+            if (!saved) {
+                alert('저장된 통계가 없습니다.');
+                return;
+            }
+            
+            const topicStats = JSON.parse(saved);
+            const topics = ['basic', 'calculation', 'special', 'application', 'mixed'];
+            const topicNames = {
+                'basic': '기본 개념',
+                'calculation': '삼각비 계산',
+                'special': '특수각',
+                'application': '활용 문제',
+                'mixed': '종합 문제'
+            };
+            
+            let progressHtml = '<div style="background: #f8f9ff; padding: 20px; border-radius: 15px; text-align: left; margin: 20px 0;">';
+            progressHtml += '<h3 style="text-align: center; margin-bottom: 20px; color: #333;">📊 상세 진도 현황</h3>';
+            
+            topics.forEach(topic => {
+                const stat = topicStats[topic];
+                const topicItem = document.querySelector(`[data-topic="${topic}"]`);
+                const isCompleted = topicItem && topicItem.classList.contains('completed');
+                
+                if (stat) {
+                    const rate = stat.totalSolved > 0 ? Math.round((stat.correctAnswers / stat.totalSolved) * 100) : 0;
+                    const statusColor = rate >= 66 ? '#27ae60' : '#e74c3c';
+                    const statusText = rate >= 66 ? '✅ 통과' : '❌ 재도전 필요';
+                    
+                    progressHtml += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; margin: 5px 0; background: white; border-radius: 8px;">
+                            <span><strong>${topicNames[topic]}</strong></span>
+                            <span style="color: ${statusColor}; font-weight: bold;">${rate}% ${statusText}</span>
+                        </div>
+                    `;
+                } else {
+                    progressHtml += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; margin: 5px 0; background: white; border-radius: 8px;">
+                            <span><strong>${topicNames[topic]}</strong></span>
+                            <span style="color: #95a5a6;">미완료</span>
+                        </div>
+                    `;
+                }
+            });
+            
+            progressHtml += '</div>';
+            
+            // 전체 정답률 계산
+            const totalSolved = Object.values(topicStats).reduce((sum, stat) => sum + stat.totalSolved, 0);
+            const totalCorrect = Object.values(topicStats).reduce((sum, stat) => sum + stat.correctAnswers, 0);
+            const overallRate = totalSolved > 0 ? Math.round((totalCorrect / totalSolved) * 100) : 0;
+            
+            document.getElementById('problemCard').innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <h2 style="color: #4facfe; margin-bottom: 20px;">📊 나의 학습 현황</h2>
+                    <p style="font-size: 1.2em; margin-bottom: 20px;">
+                        전체 정답률: <strong style="color: ${overallRate >= 66 ? '#27ae60' : '#e74c3c'};">${overallRate}%</strong>
+                    </p>
+                    ${progressHtml}
+                    <p style="font-size: 1em; color: #666; margin-bottom: 30px; line-height: 1.6;">
+                        💡 <strong>진짜 100% 달성 조건</strong><br>
+                        모든 주제를 66% 이상으로 완료해야 합니다!
+                    </p>
+                    <div style="display: flex; gap: 15px; justify-content: center;">
+                        <button class="btn btn-primary" onclick="goToWelcome()">주제 선택하기</button>
+                        <button class="btn btn-secondary" onclick="resetProgress()">처음부터 다시 시작</button>
+                    </div>
+                </div>
+            `;
+        }
+        function checkTrue100Percent() {
+            // 저장된 주제별 통계가 있는지 확인
+            const saved = localStorage.getItem('trigonometry_topic_stats');
+            if (!saved) return false;
+            
+            const topicStats = JSON.parse(saved);
+            const topics = ['basic', 'calculation', 'special', 'application', 'mixed'];
+            
+            console.log('주제별 통계 확인:', topicStats); // 디버그용
+            
+            // 모든 주제가 66% 이상인지 확인
+            const allTopicsPass = topics.every(topic => {
+                const stat = topicStats[topic];
+                if (!stat) return false;
+                
+                const rate = stat.totalSolved > 0 ? (stat.correctAnswers / stat.totalSolved) * 100 : 0;
+                console.log(`${topic} 정답률: ${rate.toFixed(1)}%`); // 디버그용
+                return rate >= 66;
+            });
+            
+            // 전체 정답률도 확인 (보조 조건)
+            const totalSolved = Object.values(topicStats).reduce((sum, stat) => sum + stat.totalSolved, 0);
+            const totalCorrect = Object.values(topicStats).reduce((sum, stat) => sum + stat.correctAnswers, 0);
+            const overallRate = totalSolved > 0 ? (totalCorrect / totalSolved) * 100 : 0;
+            
+            console.log(`전체 정답률: ${overallRate.toFixed(1)}%, 모든 주제 통과: ${allTopicsPass}`); // 디버그용
+            
+            return allTopicsPass && overallRate >= 66;
+        }
+
+        // 주제별 통계 저장
+        function saveTopicStats() {
+            const saved = localStorage.getItem('trigonometry_topic_stats');
+            let topicStats = saved ? JSON.parse(saved) : {};
+            
+            // 현재 주제 통계 업데이트
+            if (!topicStats[currentTopic]) {
+                topicStats[currentTopic] = { totalSolved: 0, correctAnswers: 0 };
+            }
+            
+            topicStats[currentTopic] = {
+                totalSolved: stats.totalSolved,
+                correctAnswers: stats.correctAnswers
+            };
+            
+            localStorage.setItem('trigonometry_topic_stats', JSON.stringify(topicStats));
+            console.log(`${currentTopic} 통계 저장:`, topicStats[currentTopic]); // 디버그용
+        }
+
+        // 주제 완료 표시 (수정된 버전)
         function showTopicComplete() {
             const correctRate = stats.totalSolved > 0 ? Math.round((stats.correctAnswers / stats.totalSolved) * 100) : 0;
+            console.log(`현재 주제: ${currentTopic}, 정답률: ${correctRate}%`); // 디버그용
+            
+            // 주제별 통계 저장
+            saveTopicStats();
             
             // 모든 주제에 66% 기준 적용
             if (correctRate < 66) {
@@ -1140,33 +1283,37 @@
                     </div>
                 `;
             } else {
-                // 66% 이상 달성 시 다음 주제 추천
-                let nextTopicButtons = '';
-                let congratsMessage = '';
-                
-                // 모든 주제 완료 확인
+                // 66% 이상 달성 시
                 const allTopicsCompleted = checkAllTopicsCompleted();
+                const true100Percent = checkTrue100Percent();
                 
-                if (currentTopic === 'mixed' && allTopicsCompleted && correctRate >= 66) {
-                    // 모든 주제 완료 + 종합문제까지 완료 = 100% 달성!
+                console.log(`모든 주제 완료 여부: ${allTopicsCompleted}`); // 디버그용
+                console.log(`현재 주제가 종합문제인가: ${currentTopic === 'mixed'}`); // 디버그용
+                console.log(`진짜 100% 달성: ${true100Percent}`); // 디버그용
+                
+                // **엄격한 100% 달성 조건**: 종합문제 완료 + 모든 주제 완료 + 실제 100% 달성
+                if (currentTopic === 'mixed' && allTopicsCompleted && true100Percent) {
+                    console.log('🎉 진짜 100% 달성 조건 만족!'); // 디버그용
+                    
                     document.getElementById('problemCard').innerHTML = `
                         <div style="text-align: center; padding: 40px;">
                             <h1 style="color: #27ae60; margin-bottom: 20px; font-size: 3em;">🏆</h1>
                             <h2 style="color: #27ae60; margin-bottom: 20px;">삼각비 마스터 달성!</h2>
                             <p style="font-size: 1.3em; margin-bottom: 20px; color: #27ae60; font-weight: bold;">
-                                🎉 100% 완전 정복! 🎉
+                                🎉 진짜 100% 완전 정복! 🎉
                             </p>
                             <p style="font-size: 1.1em; margin-bottom: 30px; line-height: 1.6;">
-                                모든 주제를 완료하고 종합문제까지 성공했습니다!<br>
+                                모든 주제를 66% 이상으로 완료하고 종합문제까지 성공했습니다!<br>
                                 당신은 진정한 <strong>삼각비 마스터</strong>입니다! 👑
                             </p>
                             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 15px; margin: 20px 0;">
-                                <h3 style="margin-bottom: 15px;">🏫 3학년 6반 학생들</h3>
-                                <p style="margin-bottom: 15px;">100% 달성 인증샷을 업로드해주세요!</p>
+                                <h3 style="margin-bottom: 15px;">🏫 3학년 전체 학급</h3>
+                                <p style="margin-bottom: 15px;">100% 달성 인증샷을 해당 반 게시판에 업로드해주세요!</p>
+                                <p style="font-size: 0.9em; opacity: 0.9;">3-1, 3-2, 3-3, 3-4, 3-5, 3-6반 모두 환영합니다! 🎉</p>
                             </div>
                             <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                                <button class="btn btn-primary" onclick="captureAndUpload()" style="background: linear-gradient(135deg, #27ae60, #2ecc71); font-size: 1.1em; padding: 15px 25px;">
-                                    📸 인증샷 캡처 & 업로드
+                                <button class="btn btn-primary" onclick="selectClassAndUpload()" style="background: linear-gradient(135deg, #27ae60, #2ecc71); font-size: 1.1em; padding: 15px 25px;">
+                                    📸 반 선택 & 인증샷 업로드
                                 </button>
                                 <button class="btn btn-secondary" onclick="resetProgress()">새로운 도전 시작</button>
                                 <button class="btn btn-secondary" onclick="goToWelcome()">주제 선택하기</button>
@@ -1174,7 +1321,15 @@
                         </div>
                     `;
                     return;
+                } else {
+                    console.log('100% 달성 조건 미만족 - 일반 완료 메시지 표시'); // 디버그용
+                    if (currentTopic === 'mixed' && !true100Percent) {
+                        console.log('종합문제는 완료했지만 다른 주제들의 정답률이 부족함'); // 디버그용
+                    }
                 }
+                
+                let nextTopicButtons = '';
+                let congratsMessage = '';
                 
                 switch(currentTopic) {
                     case 'basic':
@@ -1205,8 +1360,16 @@
                         `;
                         break;
                     case 'mixed':
-                        congratsMessage = '종합 문제를 완료했습니다! 다른 주제들도 완료해서 100%를 달성해보세요!';
-                        nextTopicButtons = '';
+                        if (allTopicsCompleted && !true100Percent) {
+                            congratsMessage = '종합 문제를 완료했습니다! 하지만 일부 주제의 정답률이 66% 미만입니다. 모든 주제를 66% 이상으로 완료해야 진짜 100% 달성입니다!';
+                        } else if (!allTopicsCompleted) {
+                            congratsMessage = '종합 문제를 완료했습니다! 다른 주제들도 완료해서 진짜 100%를 달성해보세요!';
+                        } else {
+                            congratsMessage = '종합 문제를 완료했습니다!';
+                        }
+                        nextTopicButtons = `
+                            <button class="btn btn-secondary" onclick="showDetailedProgress()">📊 상세 진도 확인</button>
+                        `;
                         break;
                 }
                 
@@ -1231,15 +1394,6 @@
             if (completedItem && correctRate >= 66) {
                 completedItem.classList.add('completed');
             }
-        }
-
-        // 모든 주제 완료 확인
-        function checkAllTopicsCompleted() {
-            const topics = ['basic', 'calculation', 'special', 'application', 'mixed'];
-            return topics.every(topic => {
-                const topicItem = document.querySelector(`[data-topic="${topic}"]`);
-                return topicItem && topicItem.classList.contains('completed');
-            });
         }
 
         // 각 주제로 이동하는 개별 함수들
